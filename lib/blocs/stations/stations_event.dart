@@ -8,3 +8,21 @@ abstract class StationsEvent extends Equatable {
 }
 
 class GetStations extends StationsEvent {}
+
+class UpdateStation extends StationsEvent {
+  final Station station;
+
+  const UpdateStation({required this.station});
+
+  @override
+  List<Object> get props => [station];
+}
+
+class DeleteStation extends StationsEvent {
+  final Station station;
+
+  const DeleteStation({required this.station});
+
+  @override
+  List<Object> get props => [station];
+}

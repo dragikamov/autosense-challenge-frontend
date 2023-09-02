@@ -7,6 +7,14 @@ class APIRepository {
   Future<StationsModel> getStations() {
     return _provider.getStations();
   }
+
+  Future<StationsModel> updateStation(Station station) {
+    return _provider.updateStation(station);
+  }
+
+  Future<StationsModel> deleteStation(Station station) {
+    return _provider.deleteStation(station);
+  }
 }
 
 class NetworkError extends Error {}

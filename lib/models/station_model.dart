@@ -32,7 +32,7 @@ class Station {
   String? city;
   double? latitude;
   double? longitude;
-  List<Pump>? pumps;
+  List<Pump> pumps;
 
   Station({
     required this.id,
@@ -56,7 +56,7 @@ class Station {
       longitude: json['longitude'],
       pumps: json['pumps'] != null
           ? (json['pumps'] as List).map((i) => Pump.fromJson(i)).toList()
-          : null,
+          : [],
     );
   }
 
@@ -73,13 +73,13 @@ class Station {
 }
 
 class Pump {
-  final int id;
+  final int? id;
   final String fuelType;
   final double price;
   final bool available;
 
   Pump({
-    required this.id,
+    this.id,
     required this.fuelType,
     required this.price,
     required this.available,

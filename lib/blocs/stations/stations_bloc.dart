@@ -23,5 +23,34 @@ class StationsBloc extends Bloc<StationsEvent, StationsState> {
             message: "Couldn't fetch data. Is the device online?"));
       }
     });
+
+    on<UpdateStation>((event, emit) async {
+      try {
+        final StationsModel stationsModel =
+            await apiRepository.updateStation(event.station);
+        if (stationsModel.error != null) {
+          emit(StationsError(message: stationsModel.error!));
+        }
+      } on NetworkError {
+        emit(const StationsError(
+            message: "Couldn't update station. Is the device online?"));
+      }
+    });
+
+    on<DeleteStation>((event, emit) async {
+      try {
+        final StationsModel stationsModel =
+            await apiRepository.deleteStation(event.station);
+
+        add(GetStations());
+
+        if (stationsModel.error != null) {
+          emit(StationsError(message: stationsModel.error!));
+        }
+      } on NetworkError {
+        emit(const StationsError(
+            message: "Couldn't delete station. Is the device online?"));
+      }
+    });
   }
 }

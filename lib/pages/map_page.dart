@@ -1,5 +1,7 @@
 import 'package:autosense_challenge_frontend/blocs/stations/stations_bloc.dart';
 import 'package:autosense_challenge_frontend/models/station_model.dart';
+import 'package:autosense_challenge_frontend/pages/details_page.dart';
+import 'package:autosense_challenge_frontend/pages/stations_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -21,7 +23,6 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  final StationsBloc _stationsBloc = StationsBloc();
   late CameraPosition _initialCameraPosition;
 
   GoogleMapController? _googleMapController;
@@ -29,14 +30,14 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    _stationsBloc.add(GetStations());
+    BlocProvider.of<StationsBloc>(context).add(GetStations());
     _initialCameraPosition = widget.initialCameraPosition;
     getCurrentLocation();
   }
 
   @override
   void dispose() {
-    _stationsBloc.close();
+    BlocProvider.of<StationsBloc>(context).close();
     _googleMapController?.dispose();
     super.dispose();
   }
@@ -97,124 +98,127 @@ class _MapPageState extends State<MapPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Gas Stations'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              BlocProvider.of<StationsBloc>(context).add(GetStations());
+              getCurrentLocation();
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Container(
           margin: const EdgeInsets.all(8),
-          child: BlocProvider(
-            create: (_) => _stationsBloc,
-            child: BlocListener<StationsBloc, StationsState>(
-              listener: (context, state) {
-                if (state is StationsError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.message),
-                    ),
-                  );
-                }
-              },
-              child: BlocBuilder<StationsBloc, StationsState>(
-                builder: (context, state) {
-                  if (state is StationsInitial || state is StationsLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (state is StationsLoaded) {
-                    return Scaffold(
-                      body: GoogleMap(
-                        initialCameraPosition: _initialCameraPosition,
-                        myLocationButtonEnabled: false,
-                        myLocationEnabled: true,
-                        mapToolbarEnabled: false,
-                        onMapCreated: (controller) =>
-                            _googleMapController = controller,
-                        markers: state.stationsModel.stations
-                            ?.map(
-                              (Station e) => Marker(
-                                markerId: MarkerId(e.idName!),
-                                position: LatLng(e.latitude!, e.longitude!),
-                                infoWindow: InfoWindow(
-                                  title: e.name,
-                                  snippet: e.address,
-                                  onTap: () {
-                                    // TODO: Show station details
-                                    print(e.name! + " InfoWindow tapped");
-                                  },
-                                ),
-                              ),
-                            )
-                            .toSet() as Set<Marker>,
-                      ),
-                      floatingActionButtonLocation:
-                          FloatingActionButtonLocation.centerDocked,
-                      floatingActionButton: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            FloatingActionButton(
-                              heroTag: "MyLocationButton",
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.onSecondary,
-                              foregroundColor: Theme.of(context).primaryColor,
-                              onPressed: () {
-                                getCurrentLocation();
+          child: BlocBuilder<StationsBloc, StationsState>(
+            builder: (context, state) {
+              if (state is StationsInitial || state is StationsLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is StationsLoaded) {
+                return Scaffold(
+                  body: GoogleMap(
+                    initialCameraPosition: _initialCameraPosition,
+                    myLocationButtonEnabled: false,
+                    myLocationEnabled: false, // true
+                    mapToolbarEnabled: false,
+                    onMapCreated: (controller) =>
+                        _googleMapController = controller,
+                    markers: state.stationsModel.stations
+                        ?.map(
+                          (Station e) => Marker(
+                            markerId: MarkerId(e.idName!),
+                            position: LatLng(e.latitude!, e.longitude!),
+                            infoWindow: InfoWindow(
+                              title: e.name,
+                              snippet: e.address,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        DetailsPage(station: e),
+                                  ),
+                                );
                               },
-                              child: Icon(
-                                Icons.my_location,
-                                color: Theme.of(context).primaryColor,
-                              ),
                             ),
-                            SizedBox(
-                              height: 55,
-                              width: 100,
-                              child: FloatingActionButton(
-                                heroTag: "AddButton",
-                                backgroundColor: Theme.of(context).primaryColor,
-                                foregroundColor:
-                                    Theme.of(context).colorScheme.onSecondary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                          ),
+                        )
+                        .toSet() as Set<Marker>,
+                  ),
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.centerDocked,
+                  floatingActionButton: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        FloatingActionButton(
+                          heroTag: "MyLocationButton",
+                          backgroundColor:
+                              Theme.of(context).colorScheme.onSecondary,
+                          foregroundColor: Theme.of(context).primaryColor,
+                          onPressed: () {
+                            getCurrentLocation();
+                          },
+                          child: Icon(
+                            Icons.my_location,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 55,
+                          width: 100,
+                          child: FloatingActionButton(
+                            heroTag: "AddButton",
+                            backgroundColor: Theme.of(context).primaryColor,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onSecondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => StationsForm(),
                                 ),
-                                onPressed: () {
-                                  // TODO: ADD STATION ACTION
-                                },
-                                child: Text(
-                                  "Add Station",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .merge(
+                              );
+                            },
+                            child: Text(
+                              "Add Station",
+                              style:
+                                  Theme.of(context).textTheme.bodyLarge!.merge(
                                         TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
                                               .onSecondary,
                                         ),
                                       ),
-                                ),
-                              ),
                             ),
-                            const SizedBox(
-                              height: 55,
-                              width: 55,
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    );
-                  } else if (state is StationsError) {
-                    return Center(
-                      child: Text(state.message),
-                    );
-                  } else {
-                    return const Center(
-                      child: Text('Something went wrong!'),
-                    );
-                  }
-                },
-              ),
-            ),
+                        const SizedBox(
+                          height: 55,
+                          width: 55,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              } else if (state is StationsError) {
+                return Center(
+                  child: Text(state.message),
+                );
+              } else {
+                return const Center(
+                  child: Text('Something went wrong!'),
+                );
+              }
+            },
           ),
         ),
       ),
