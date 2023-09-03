@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 
 class AddPumpDialog extends StatefulWidget {
   final int? id;
+  final String? idName;
   final String? fuelType;
   final double? price;
   final bool? available;
-  final void Function(int? id, String fuelType, double price, bool available)
+  final void Function(
+          int? id, String idName, String fuelType, double price, bool available)
       onDone;
 
   const AddPumpDialog({
     Key? key,
     this.id,
+    this.idName,
     this.fuelType,
     this.price,
     this.available,
@@ -23,21 +26,24 @@ class AddPumpDialog extends StatefulWidget {
 }
 
 class _AddPumpDialogState extends State<AddPumpDialog> {
+  String idName = "";
   String fuelType = "";
-  double price = 0;
+  double? price;
   bool available = true;
 
   @override
   void initState() {
     super.initState();
+    idName = widget.idName ?? "";
     fuelType = widget.fuelType ?? "";
-    price = widget.price ?? 0;
+    price = widget.price;
     available = widget.available ?? true;
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      scrollable: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
           Radius.circular(15),
@@ -55,16 +61,22 @@ class _AddPumpDialogState extends State<AddPumpDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           MyTextField(
+              initialValue: idName,
+              hint: "ID",
+              onChanged: (value) {
+                idName = value;
+              }),
+          MyTextField(
               initialValue: fuelType,
               hint: "Fuel Type",
               onChanged: (value) {
                 fuelType = value;
               }),
           MyTextField(
-              initialValue: price.toString(),
+              initialValue: price != null ? price.toString() : "",
               hint: "Price",
               onChanged: (value) {
-                price = double.parse(value);
+                price = double.tryParse(value);
               }),
           Row(
             children: [
@@ -93,7 +105,8 @@ class _AddPumpDialogState extends State<AddPumpDialog> {
                 ),
           ),
           onPressed: () {
-            widget.onDone(widget.id, fuelType, price, available);
+            if (fuelType.isEmpty || price == null) return;
+            widget.onDone(widget.id, idName, fuelType, price!, available);
             Navigator.pop(context);
           },
         ),

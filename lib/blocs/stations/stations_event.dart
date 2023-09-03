@@ -18,6 +18,15 @@ class UpdateStation extends StationsEvent {
   List<Object> get props => [station];
 }
 
+class CreateStation extends StationsEvent {
+  final Station station;
+
+  const CreateStation({required this.station});
+
+  @override
+  List<Object> get props => [station];
+}
+
 class DeleteStation extends StationsEvent {
   final Station station;
 

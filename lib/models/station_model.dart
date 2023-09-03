@@ -74,30 +74,38 @@ class Station {
 
 class Pump {
   final int? id;
+  final String idName;
   final String fuelType;
   final double price;
   final bool available;
+  bool deleted;
 
   Pump({
     this.id,
+    required this.idName,
     required this.fuelType,
     required this.price,
     required this.available,
+    this.deleted = false,
   });
 
   factory Pump.fromJson(Map<String, dynamic> json) {
     return Pump(
       id: json['id'],
+      idName: json['id_name'],
       fuelType: json['fuel_type'],
-      price: json['price'],
+      price: double.parse(json['price'].toString()),
       available: json['available'] == 1 ? true : false,
+      deleted: false,
     );
   }
 
   Map<String, dynamic> toJson() => {
         'id': id,
+        'id_name': idName,
         'fuel_type': fuelType,
         'price': price,
         'available': available,
+        'deleted': deleted,
       };
 }

@@ -1,5 +1,6 @@
 import 'package:autosense_challenge_frontend/blocs/stations/stations_bloc.dart';
 import 'package:autosense_challenge_frontend/pages/map_page.dart';
+import 'package:autosense_challenge_frontend/widgets/snackbar_global.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,10 +13,8 @@ void main() {
       child: BlocListener<StationsBloc, StationsState>(
         listener: (context, state) {
           if (state is StationsError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-              ),
+            SnackbarGlobal.show(
+              state.message,
             );
           }
         },
@@ -36,6 +35,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      scaffoldMessengerKey: SnackbarGlobal.key,
       debugShowCheckedModeBanner: false,
       home: const MapPage(),
     );

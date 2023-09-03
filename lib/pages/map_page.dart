@@ -8,15 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 class MapPage extends StatefulWidget {
-  final CameraPosition initialCameraPosition;
-
-  const MapPage({
-    super.key,
-    this.initialCameraPosition = const CameraPosition(
-      target: LatLng(46.8679, 8.2502),
-      zoom: 8,
-    ),
-  });
+  const MapPage({super.key});
 
   @override
   State<StatefulWidget> createState() => _MapPageState();
@@ -31,7 +23,10 @@ class _MapPageState extends State<MapPage> {
   void initState() {
     super.initState();
     BlocProvider.of<StationsBloc>(context).add(GetStations());
-    _initialCameraPosition = widget.initialCameraPosition;
+    _initialCameraPosition = const CameraPosition(
+      target: LatLng(46.8679, 8.2502),
+      zoom: 8,
+    );
     getCurrentLocation();
   }
 
@@ -83,13 +78,6 @@ class _MapPageState extends State<MapPage> {
           ),
         ),
       );
-    } else {
-      // TODO: Show alert dialog for not allowing location permissions
-      // SharedService.showAlertDialog(
-      //   context,
-      //   AppLocalizations.of(context)!.warning,
-      //   AppLocalizations.of(context)!.location_permission_required,
-      // );
     }
   }
 
@@ -122,7 +110,7 @@ class _MapPageState extends State<MapPage> {
                   body: GoogleMap(
                     initialCameraPosition: _initialCameraPosition,
                     myLocationButtonEnabled: false,
-                    myLocationEnabled: false, // true
+                    myLocationEnabled: false, // TODO: true
                     mapToolbarEnabled: false,
                     onMapCreated: (controller) =>
                         _googleMapController = controller,
@@ -184,7 +172,7 @@ class _MapPageState extends State<MapPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => StationsForm(),
+                                  builder: (context) => const StationsForm(),
                                 ),
                               );
                             },

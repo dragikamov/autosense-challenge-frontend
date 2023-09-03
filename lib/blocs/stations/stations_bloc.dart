@@ -28,12 +28,31 @@ class StationsBloc extends Bloc<StationsEvent, StationsState> {
       try {
         final StationsModel stationsModel =
             await apiRepository.updateStation(event.station);
+
+        add(GetStations());
+
         if (stationsModel.error != null) {
           emit(StationsError(message: stationsModel.error!));
         }
       } on NetworkError {
         emit(const StationsError(
             message: "Couldn't update station. Is the device online?"));
+      }
+    });
+
+    on<CreateStation>((event, emit) async {
+      try {
+        final StationsModel stationsModel =
+            await apiRepository.createStation(event.station);
+
+        add(GetStations());
+
+        if (stationsModel.error != null) {
+          emit(StationsError(message: stationsModel.error!));
+        }
+      } on NetworkError {
+        emit(const StationsError(
+            message: "Couldn't create station. Is the device online?"));
       }
     });
 

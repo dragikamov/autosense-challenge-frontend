@@ -1,5 +1,6 @@
 import 'package:autosense_challenge_frontend/blocs/stations/stations_bloc.dart';
 import 'package:autosense_challenge_frontend/models/station_model.dart';
+import 'package:autosense_challenge_frontend/pages/stations_form.dart';
 import 'package:autosense_challenge_frontend/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,6 +20,58 @@ class DetailsPage extends StatefulWidget {
 class _DetailsPageState extends State<DetailsPage> {
   @override
   Widget build(BuildContext context) {
+    Widget yesButton = TextButton(
+      child: const Text(
+        "Yes",
+        style: TextStyle(
+          color: Colors.black,
+        ),
+      ),
+      onPressed: () {
+        BlocProvider.of<StationsBloc>(context).add(
+          DeleteStation(station: widget.station),
+        );
+        Navigator.pop(context);
+        Navigator.pop(context);
+      },
+    );
+
+    Widget noButton = TextButton(
+      child: const Text(
+        "No",
+        style: TextStyle(
+          color: Colors.black,
+        ),
+      ),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    AlertDialog deleteAlert = AlertDialog(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(20),
+        ),
+      ),
+      title: const Text(
+        "Warning",
+        style: TextStyle(
+          color: Colors.black,
+        ),
+      ),
+      content: const Text(
+        "Are you sure that you want to delete this station?",
+        style: TextStyle(
+          color: Colors.black,
+        ),
+      ),
+      actions: [
+        yesButton,
+        noButton,
+      ],
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.station.name!),
@@ -54,21 +107,42 @@ class _DetailsPageState extends State<DetailsPage> {
               "Pumps:",
               style: TextStyle(fontSize: 18),
             ),
-            Container(
-              padding: const EdgeInsets.only(left: 15),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return Text(
-                      "${widget.station.pumps[index].fuelType} - ${widget.station.pumps[index].price}");
-                },
-                separatorBuilder: (context, index) {
-                  return const SizedBox(
-                    height: 10,
-                  );
-                },
-                itemCount: widget.station.pumps.length,
-              ),
+            ListView.separated(
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: ListTile(
+                    // add grey border
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          color: widget.station.pumps[index].available
+                              ? Colors.green
+                              : Colors.red,
+                        ),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(20),
+                        )),
+                    title: Text(
+                      widget.station.pumps[index].fuelType,
+                    ),
+                    subtitle: Text(
+                      widget.station.pumps[index].price.toString(),
+                    ),
+                    trailing: Text(
+                      widget.station.pumps[index].available
+                          ? "Available"
+                          : "Not Available",
+                    ),
+                  ),
+                );
+              },
+              separatorBuilder: (context, index) {
+                return const SizedBox(
+                  height: 10,
+                );
+              },
+              itemCount: widget.station.pumps.length,
             ),
             const SizedBox(
               height: 20,
@@ -86,7 +160,16 @@ class _DetailsPageState extends State<DetailsPage> {
                       ),
                     ),
                     color: Colors.green[300]!,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => StationsForm(
+                            station: widget.station,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 SizedBox(
@@ -100,15 +183,38 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                     color: Colors.red[300]!,
                     onPressed: () {
-                      BlocProvider.of<StationsBloc>(context).add(
-                        DeleteStation(station: widget.station),
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return deleteAlert;
+                        },
                       );
-                      Navigator.pop(context);
                     },
                   ),
                 ),
               ],
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  width: 200,
+                  child: MyButton(
+                    widget: const Text(
+                      "Done",
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                    color: Colors.blue[300]!,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            )
           ],
         ),
       ),

@@ -12,6 +12,10 @@ class APIRepository {
     return _provider.updateStation(station);
   }
 
+  Future<StationsModel> createStation(Station station) {
+    return _provider.createStation(station);
+  }
+
   Future<StationsModel> deleteStation(Station station) {
     return _provider.deleteStation(station);
   }

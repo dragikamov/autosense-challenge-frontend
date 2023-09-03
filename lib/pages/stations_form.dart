@@ -1,8 +1,10 @@
+import 'package:autosense_challenge_frontend/blocs/stations/stations_bloc.dart';
 import 'package:autosense_challenge_frontend/models/station_model.dart';
 import 'package:autosense_challenge_frontend/widgets/add_pump_dialog.dart';
 import 'package:autosense_challenge_frontend/widgets/my_button.dart';
 import 'package:autosense_challenge_frontend/widgets/my_textfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StationsForm extends StatefulWidget {
   final Station? station;
@@ -19,17 +21,27 @@ class _StationsFormState extends State<StationsForm> {
   @override
   void initState() {
     super.initState();
-    station = widget.station ??
-        Station(
-          id: null,
-          idName: null,
-          name: null,
-          address: null,
-          city: null,
-          longitude: null,
-          latitude: null,
-          pumps: [],
-        );
+    station = widget.station != null
+        ? Station(
+            id: widget.station?.id,
+            idName: widget.station?.idName,
+            name: widget.station?.name,
+            address: widget.station?.address,
+            city: widget.station?.city,
+            latitude: widget.station?.latitude,
+            longitude: widget.station?.longitude,
+            pumps: widget.station?.pumps ?? [],
+          )
+        : Station(
+            id: null,
+            idName: null,
+            name: null,
+            address: null,
+            city: null,
+            longitude: null,
+            latitude: null,
+            pumps: [],
+          );
   }
 
   @override
@@ -47,144 +59,205 @@ class _StationsFormState extends State<StationsForm> {
             children: [
               MyTextField(
                 hint: "ID",
+                initialValue: station.idName,
                 onChanged: (value) {
                   station.idName = value;
                 },
               ),
               MyTextField(
                 hint: "Name",
+                initialValue: station.name,
                 onChanged: (value) {
                   station.name = value;
                 },
               ),
               MyTextField(
                 hint: "Address",
+                initialValue: station.address,
                 onChanged: (value) {
                   station.address = value;
                 },
               ),
               MyTextField(
                 hint: "City",
+                initialValue: station.city,
                 onChanged: (value) {
                   station.city = value;
                 },
               ),
               MyTextField(
-                hint: "Longitude",
+                hint: "Latitude",
+                initialValue:
+                    station.latitude != null ? station.latitude.toString() : "",
                 onChanged: (value) {
-                  station.longitude = double.parse(value);
+                  station.latitude = double.tryParse(value);
                 },
               ),
               MyTextField(
-                hint: "Latitude",
+                hint: "Longitude",
+                initialValue: station.longitude != null
+                    ? station.longitude.toString()
+                    : "",
                 onChanged: (value) {
-                  station.latitude = double.parse(value);
+                  station.longitude = double.tryParse(value);
                 },
               ),
-              const Padding(
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  "Pumps:",
-                  style: TextStyle(fontSize: 18),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Pumps:",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AddPumpDialog(
+                              onDone: (id, idName, fuelType, price, available) {
+                                setState(() {
+                                  station.pumps.add(
+                                    Pump(
+                                      id: id,
+                                      idName: idName,
+                                      fuelType: fuelType,
+                                      price: price,
+                                      available: available,
+                                    ),
+                                  );
+                                });
+                              },
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
                 ),
               ),
-              ListView.separated(
+              ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(
-                      station.pumps[index].fuelType,
-                    ),
-                    subtitle: Text(
-                      station.pumps[index].price.toString(),
-                    ),
-                    trailing: SizedBox(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AddPumpDialog(
-                                    id: station.pumps[index].id,
-                                    fuelType: station.pumps[index].fuelType,
-                                    price: station.pumps[index].price,
-                                    available: station.pumps[index].available,
-                                    onDone: (id, fuelType, price, available) {
-                                      setState(() {
-                                        station.pumps[index] = Pump(
-                                          id: id,
-                                          fuelType: fuelType,
-                                          price: price,
-                                          available: available,
-                                        );
-                                      });
-                                    },
-                                  );
-                                },
-                              );
-                            },
+                  if (station.pumps[index].deleted) {
+                    return const SizedBox();
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: ListTile(
+                      // add grey border
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            color: station.pumps[index].available
+                                ? Colors.green
+                                : Colors.red,
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () {
-                              setState(() {
-                                station.pumps.removeAt(index);
-                              });
-                            },
-                          ),
-                        ],
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(20),
+                          )),
+                      title: Text(
+                        station.pumps[index].fuelType,
+                      ),
+                      subtitle: Text(
+                        station.pumps[index].price.toString(),
+                      ),
+                      trailing: SizedBox(
+                        width: 100,
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AddPumpDialog(
+                                      id: station.pumps[index].id,
+                                      idName: station.pumps[index].idName,
+                                      fuelType: station.pumps[index].fuelType,
+                                      price: station.pumps[index].price,
+                                      available: station.pumps[index].available,
+                                      onDone: (id, idName, fuelType, price,
+                                          available) {
+                                        setState(() {
+                                          station.pumps[index] = Pump(
+                                            id: id,
+                                            idName: idName,
+                                            fuelType: fuelType,
+                                            price: price,
+                                            available: available,
+                                          );
+                                        });
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                setState(() {
+                                  if (station.pumps[index].id != null) {
+                                    station.pumps[index].deleted = true;
+                                  } else {
+                                    station.pumps.removeAt(index);
+                                  }
+                                });
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
                 },
-                separatorBuilder: (context, index) {
-                  return const Divider();
-                },
                 itemCount: station.pumps.length,
               ),
-              MyButton(
-                widget: const Text(
-                  "Add Pump",
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AddPumpDialog(
-                        onDone: (id, fuelType, price, available) {
-                          setState(() {
-                            station.pumps.add(
-                              Pump(
-                                id: id,
-                                fuelType: fuelType,
-                                price: price,
-                                available: available,
-                              ),
-                            );
-                          });
-                        },
-                      );
-                    },
-                  );
-                },
+              const SizedBox(
+                height: 20,
               ),
               MyButton(
                 widget: const Text(
-                  "Add Station",
+                  "Save Station",
                   style: TextStyle(
                     color: Colors.white,
                   ),
                 ),
                 onPressed: () {
-                  // TODO: Add Station
+                  if (station.idName == null ||
+                      station.name == null ||
+                      station.address == null ||
+                      station.city == null ||
+                      station.latitude == null ||
+                      station.longitude == null) {
+                    return;
+                  }
+
+                  if (widget.station == null) {
+                    // Add station
+                    BlocProvider.of<StationsBloc>(context).add(
+                      CreateStation(
+                        station: station,
+                      ),
+                    );
+                  } else {
+                    // Update station
+                    BlocProvider.of<StationsBloc>(context).add(
+                      UpdateStation(
+                        station: station,
+                      ),
+                    );
+                  }
+                  Navigator.popUntil(context, (route) => route.isFirst);
                 },
               ),
             ],

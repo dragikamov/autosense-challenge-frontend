@@ -22,7 +22,6 @@ class APIProvider {
     }
   }
 
-  // TODO: TEST THIS
   Future<StationsModel> updateStation(Station station) async {
     try {
       final response = await _dio.put(
@@ -36,6 +35,22 @@ class APIProvider {
     } catch (error, stacktrace) {
       print("Exception occured: $error stackTrace: $stacktrace");
       return StationsModel.withError("Error updating data");
+    }
+  }
+
+  Future<StationsModel> createStation(Station station) async {
+    try {
+      final response = await _dio.post(
+        _url,
+        data: station.toJson(),
+        options: Options(
+          headers: {'Authorization': token},
+        ),
+      );
+      return StationsModel.fromJson(response.data);
+    } catch (error, stacktrace) {
+      print("Exception occured: $error stackTrace: $stacktrace");
+      return StationsModel.withError("Error creating station");
     }
   }
 
