@@ -1,6 +1,7 @@
 import 'package:autosense_challenge_frontend/widgets/my_textfield.dart';
 import 'package:flutter/material.dart';
 
+// A dialog that can be used to add or edit a pump
 class AddPumpDialog extends StatefulWidget {
   final int? id;
   final String? idName;
@@ -34,6 +35,7 @@ class _AddPumpDialogState extends State<AddPumpDialog> {
   @override
   void initState() {
     super.initState();
+    // If the dialog is used to edit a pump, the initial values are set
     idName = widget.idName ?? "";
     fuelType = widget.fuelType ?? "";
     price = widget.price;
@@ -75,6 +77,7 @@ class _AddPumpDialogState extends State<AddPumpDialog> {
           MyTextField(
               initialValue: price != null ? price.toString() : "",
               hint: "Price",
+              validator: RegExp(r'^[0-9]*\.?[0-9]*$'),
               onChanged: (value) {
                 price = double.tryParse(value);
               }),
@@ -105,6 +108,7 @@ class _AddPumpDialogState extends State<AddPumpDialog> {
                 ),
           ),
           onPressed: () {
+            // Validate the form and only if valid call the onDone callback
             if (fuelType.isEmpty || price == null) return;
             widget.onDone(widget.id, idName, fuelType, price!, available);
             Navigator.pop(context);

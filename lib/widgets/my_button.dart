@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 
+// A custom button that can be used throughout the app
 class MyButton extends StatelessWidget {
   final Widget widget;
   final Function onPressed;
-  final double roundness;
   final Color? color;
-  final Color? accentColor;
 
   const MyButton({
     Key? key,
     required this.widget,
     required this.onPressed,
-    this.roundness = 28,
     this.color,
-    this.accentColor,
   }) : super(key: key);
 
   @override
@@ -33,9 +30,9 @@ class MyButton extends StatelessWidget {
             ),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(roundness),
+                borderRadius: BorderRadius.circular(20),
                 side: BorderSide(
-                  color: accentColor ?? color ?? Theme.of(context).primaryColor,
+                  color: color ?? Theme.of(context).primaryColor,
                 ),
               ),
             ),

@@ -6,6 +6,7 @@ import 'package:autosense_challenge_frontend/widgets/my_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+// A form that can be used to add or update a station
 class StationsForm extends StatefulWidget {
   final Station? station;
 
@@ -21,6 +22,7 @@ class _StationsFormState extends State<StationsForm> {
   @override
   void initState() {
     super.initState();
+    // If station is not null, then we are updating a station
     station = widget.station != null
         ? Station(
             id: widget.station?.id,
@@ -89,6 +91,7 @@ class _StationsFormState extends State<StationsForm> {
                 hint: "Latitude",
                 initialValue:
                     station.latitude != null ? station.latitude.toString() : "",
+                validator: RegExp(r'^[0-9]*\.?[0-9]*$'),
                 onChanged: (value) {
                   station.latitude = double.tryParse(value);
                 },
@@ -98,6 +101,7 @@ class _StationsFormState extends State<StationsForm> {
                 initialValue: station.longitude != null
                     ? station.longitude.toString()
                     : "",
+                validator: RegExp(r'^[0-9]*\.?[0-9]*$'),
                 onChanged: (value) {
                   station.longitude = double.tryParse(value);
                 },
@@ -153,16 +157,16 @@ class _StationsFormState extends State<StationsForm> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 5),
                     child: ListTile(
-                      // add grey border
                       shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                            color: station.pumps[index].available
-                                ? Colors.green
-                                : Colors.red,
-                          ),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(20),
-                          )),
+                        side: BorderSide(
+                          color: station.pumps[index].available
+                              ? Colors.green
+                              : Colors.red,
+                        ),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
                       title: Text(
                         station.pumps[index].fuelType,
                       ),
@@ -206,9 +210,16 @@ class _StationsFormState extends State<StationsForm> {
                               icon: const Icon(Icons.delete),
                               onPressed: () {
                                 setState(() {
+                                  // If the pump has an id, then we want to delete
+                                  // a pump from the database and thus we mark it
+                                  // to delete it from the database
                                   if (station.pumps[index].id != null) {
                                     station.pumps[index].deleted = true;
                                   } else {
+                                    // If the pump does not have an id, then we
+                                    // want to delete a pump from the list of pumps
+                                    // that hasn't been added yet to the database
+                                    // so we can remove it from the list directly
                                     station.pumps.removeAt(index);
                                   }
                                 });

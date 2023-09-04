@@ -1,27 +1,20 @@
 import 'package:flutter/material.dart';
 
+// A custom textfield that can be used throughout the app
 class MyTextField extends StatefulWidget {
   final String hint;
-  final String? errorMessage;
   final IconData? icon;
   final ValueChanged<String> onChanged;
-  final bool? fieldUnfilled;
   final RegExp? validator;
-  final bool enabled;
   final String? initialValue;
-  final bool autocorrectDisable;
 
   const MyTextField({
     Key? key,
     required this.hint,
-    this.errorMessage,
     this.icon,
     required this.onChanged,
-    this.fieldUnfilled,
     this.validator,
-    this.enabled = true,
     this.initialValue,
-    this.autocorrectDisable = false,
   }) : super(key: key);
 
   @override
@@ -48,24 +41,17 @@ class _MyTextFieldState extends State<MyTextField> {
             color: Colors.grey[200]!,
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
-              color: widget.fieldUnfilled == true
-                  ? Colors.red[800]!
-                  : Colors.grey[700]!,
+              color: Colors.grey[700]!,
               width: 1,
             ),
           ),
           child: TextFormField(
             onChanged: widget.onChanged,
             initialValue: widget.initialValue,
-            enabled: widget.enabled,
-            autovalidateMode: widget.fieldUnfilled == null
-                ? AutovalidateMode.onUserInteraction
-                : (widget.fieldUnfilled!
-                    ? AutovalidateMode.always
-                    : AutovalidateMode.disabled),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (text) {
               if (text == null || text.isEmpty) {
-                return '${widget.errorMessage ?? widget.hint} is required';
+                return '${widget.hint} is required';
               } else if (widget.validator != null &&
                   !widget.validator!.hasMatch(text)) {
                 return '${widget.hint} is invalid';
@@ -73,7 +59,7 @@ class _MyTextFieldState extends State<MyTextField> {
 
               return null;
             },
-            autocorrect: widget.autocorrectDisable ? false : true,
+            autocorrect: true,
             decoration: InputDecoration(
               border: InputBorder.none,
               hintStyle: TextStyle(color: Colors.grey.withOpacity(0.7)),

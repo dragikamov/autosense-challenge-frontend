@@ -5,6 +5,8 @@ import 'package:autosense_challenge_frontend/widgets/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+// This page is used to display the details of a gas station
+// It also has buttons to edit or delete the gas station
 class DetailsPage extends StatefulWidget {
   final Station station;
 
@@ -20,6 +22,7 @@ class DetailsPage extends StatefulWidget {
 class _DetailsPageState extends State<DetailsPage> {
   @override
   Widget build(BuildContext context) {
+    // Yes button for the alert box for confirming the deletion of a gas station
     Widget yesButton = TextButton(
       child: const Text(
         "Yes",
@@ -36,6 +39,7 @@ class _DetailsPageState extends State<DetailsPage> {
       },
     );
 
+    // No button for the alert box for confirming the deletion of a gas station
     Widget noButton = TextButton(
       child: const Text(
         "No",
@@ -48,6 +52,7 @@ class _DetailsPageState extends State<DetailsPage> {
       },
     );
 
+    // The alert box for confirming the deletion of a gas station
     AlertDialog deleteAlert = AlertDialog(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
@@ -161,6 +166,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                     color: Colors.green[300]!,
                     onPressed: () {
+                      // Navigate to the form page to edit the gas station
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -183,6 +189,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                     color: Colors.red[300]!,
                     onPressed: () {
+                      // Show the alert box to confirm the deletion of the gas station
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -209,6 +216,7 @@ class _DetailsPageState extends State<DetailsPage> {
                     ),
                     color: Colors.blue[300]!,
                     onPressed: () {
+                      // Navigate back to the map page
                       Navigator.pop(context);
                     },
                   ),

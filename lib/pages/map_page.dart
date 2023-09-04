@@ -7,6 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
+// This page is used to display the map and the gas stations on the map as markers
+// By clicking a marker the user can see the details of the gas station
+// It also has a floating action button to add a new gas station
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -22,6 +25,7 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
+    // The initial camera position is the center of Switzerland
     BlocProvider.of<StationsBloc>(context).add(GetStations());
     _initialCameraPosition = const CameraPosition(
       target: LatLng(46.8679, 8.2502),
@@ -37,6 +41,7 @@ class _MapPageState extends State<MapPage> {
     super.dispose();
   }
 
+  // This function is used for the location permissions to use the phone's GPS
   Future<LocationData?> getLocationPermissions() async {
     Location location = Location();
 
@@ -67,6 +72,7 @@ class _MapPageState extends State<MapPage> {
     return locationData;
   }
 
+  // This function is used to get the current location of the user using GPS
   Future<void> getCurrentLocation() async {
     LocationData? locationData = await getLocationPermissions();
     if (locationData != null) {
@@ -110,7 +116,7 @@ class _MapPageState extends State<MapPage> {
                   body: GoogleMap(
                     initialCameraPosition: _initialCameraPosition,
                     myLocationButtonEnabled: false,
-                    myLocationEnabled: false, // TODO: true
+                    myLocationEnabled: true,
                     mapToolbarEnabled: false,
                     onMapCreated: (controller) =>
                         _googleMapController = controller,

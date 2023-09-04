@@ -1,11 +1,13 @@
 import 'package:autosense_challenge_frontend/models/station_model.dart';
 import 'package:dio/dio.dart';
 
+// This class is used to make API calls
 class APIProvider {
   final Dio _dio = Dio();
-  final String _url = 'http://10.0.2.2:4000/stations/';
+  // TODO: Change this to `10.0.2.2:4000/stations` if using an emulator and localhost API
+  final String _url = 'http://209.38.228.119:4000/stations/';
   final String token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJpYXQiOjE2OTM1OTY3MjksImV4cCI6MTY5Mzg1NTkyOX0.RzwzvOqju2GRCi7BtG3BP-mHvNLKwdiEz5QM7sQmIz8";
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJpYXQiOjE2OTM4NTExNTcsImV4cCI6MTY5NDQ1NTk1N30.Yp6ZvZwIZNCe6Hkj0m1ruwaFcCo1CYUP_ZlvI-GwDlM";
 
   Future<StationsModel> getStations() async {
     try {
@@ -16,8 +18,7 @@ class APIProvider {
         ),
       );
       return StationsModel.fromJson(response.data);
-    } catch (error, stacktrace) {
-      print("Exception occured: $error stackTrace: $stacktrace");
+    } catch (error) {
       return StationsModel.withError("Data not found / Connection issue");
     }
   }
@@ -32,8 +33,7 @@ class APIProvider {
         ),
       );
       return StationsModel.fromJson(response.data);
-    } catch (error, stacktrace) {
-      print("Exception occured: $error stackTrace: $stacktrace");
+    } catch (error) {
       return StationsModel.withError("Error updating data");
     }
   }
@@ -48,8 +48,7 @@ class APIProvider {
         ),
       );
       return StationsModel.fromJson(response.data);
-    } catch (error, stacktrace) {
-      print("Exception occured: $error stackTrace: $stacktrace");
+    } catch (error) {
       return StationsModel.withError("Error creating station");
     }
   }
@@ -63,8 +62,7 @@ class APIProvider {
         ),
       );
       return StationsModel.fromJson(response.data);
-    } catch (error, stacktrace) {
-      print("Exception occured: $error stackTrace: $stacktrace");
+    } catch (error) {
       return StationsModel.withError("Error deleting data");
     }
   }

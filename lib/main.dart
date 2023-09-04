@@ -6,10 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider<StationsBloc>(create: (context) => StationsBloc())
-      ],
+    // BlocProvider is used to provide the bloc to the widget tree
+    BlocProvider<StationsBloc>(
+      create: (context) => StationsBloc(),
       child: BlocListener<StationsBloc, StationsState>(
         listener: (context, state) {
           if (state is StationsError) {
