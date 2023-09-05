@@ -4,8 +4,7 @@ import 'package:dio/dio.dart';
 // This class is used to make API calls
 class APIProvider {
   final Dio _dio = Dio();
-  // TODO: Change this to `10.0.2.2:4000/stations` if using an emulator and localhost API
-  final String _url = 'http://209.38.228.119:4000/stations/';
+  final String _url = 'http://10.0.2.2:4000/stations/';
   final String token =
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJpYXQiOjE2OTM4NTExNTcsImV4cCI6MTY5NDQ1NTk1N30.Yp6ZvZwIZNCe6Hkj0m1ruwaFcCo1CYUP_ZlvI-GwDlM";
 
